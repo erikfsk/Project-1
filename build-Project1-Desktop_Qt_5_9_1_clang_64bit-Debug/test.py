@@ -7,7 +7,7 @@ x = linspace(0,1,1000)
 def g(x):
 	return 1-(1 - exp(-10))*x - exp(-10*x)
 
-infile = open("test.dat","r")
+infile = open("general.dat","r")
 x_ = []
 y_ = []
 

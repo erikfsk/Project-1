@@ -9,14 +9,14 @@ using namespace std;
 using namespace arma;
 
 double func_f (double x_i);
-mat LU_matrix(mat f_tilde,mat A);
-mat general_matrix(mat a,mat b,mat c, mat f_tilde,int n);
-mat specific_matrix(mat b, mat f_tilde,int n);
+mat LU_solver(mat f_tilde,mat A);
+mat specific_solver(mat b, mat f_tilde,int n);
+mat general_solver(mat a,mat b,mat c, mat f_tilde,int n);
 int write_to_file(string datafil,mat f_tilde,int n,double h);
 
 int main (int argc, char *argv[])
 {
-    int n = 10; double x_start = 0.0; double x_slutt = 1.0;
+    int n = 100; double x_start = 0.0; double x_slutt = 1.0;
     double h = (x_slutt-x_start)/(n+1); //x_i = i*h
 
     mat a = ones<vec>(n);a[0] = 0;
@@ -38,28 +38,24 @@ int main (int argc, char *argv[])
     //vec ar = solve(A,f_tilde);
     //solving done
 
-
     boost::timer t_;
-    mat svar_specific = specific_matrix(b,f_tilde,n);
+    mat specific_answer = specific_solver(b,f_tilde,n);
     cout << "Time usage: " << t_.elapsed() << endl;
-    write_to_file("specific.dat",svar_specific,n,h);
-
+    write_to_file("specific.dat",specific_answer,n,h);
 
     boost::timer t;
-    mat svar_general = general_matrix(a,b,c,f_tilde,n);
+    mat general_answer = general_solver(a,b,c,f_tilde,n);
     cout << "Time usage: " << t.elapsed() << endl;
-    write_to_file("general.dat",svar_general,n,h);
-
+    write_to_file("general.dat",general_answer,n,h);
 
     boost::timer t__;
-    mat svar_LU = LU_matrix(f_tilde,A);
+    mat LU_answer = LU_solver(f_tilde,A);
     cout << "Time usage: " << t__.elapsed() << endl;
-    write_to_file("LU.dat",svar_LU,n,h);
+    write_to_file("LU.dat",LU_answer,n,h);
     return 0 ;
 }
 
-
-mat general_matrix(mat a,mat b,mat c, mat f_tilde,int n)
+mat general_solver(mat a,mat b,mat c, mat f_tilde,int n)
 {
     //forward substitution
     for (int i = 1; i<n;i++){
@@ -85,7 +81,7 @@ mat general_matrix(mat a,mat b,mat c, mat f_tilde,int n)
     return f_tilde;
 }
 
-mat specific_matrix(mat b, mat f_tilde,int n)
+mat specific_solver(mat b, mat f_tilde,int n)
 {
     //forward substitution
     for (int i = 1; i<n;i++){
@@ -93,12 +89,10 @@ mat specific_matrix(mat b, mat f_tilde,int n)
         b[i] = b[i] - alpha;
         f_tilde[i] = f_tilde[i] - alpha*f_tilde[i-1];
     }
-
     //backward substitution
     for (int i = n-2; i>-1;i--){
         f_tilde[i] = f_tilde[i] - (1./b[i+1])*f_tilde[i+1];
     }
-
     //scaling
     for (int i = 0; i<n;i++){
         f_tilde[i] = f_tilde[i]/b[i];
@@ -106,7 +100,7 @@ mat specific_matrix(mat b, mat f_tilde,int n)
     return f_tilde;
 }
 
-mat LU_matrix(mat f_tilde, mat A){
+mat LU_solver(mat f_tilde, mat A){
     mat L,U;
     lu(L,U,A);
     mat Y = solve(L,f_tilde);
@@ -116,7 +110,6 @@ mat LU_matrix(mat f_tilde, mat A){
 
 int write_to_file(string datafil,mat f_tilde,int n,double h)
 {
-    //Skriv til fil:
     ofstream outFile;
     outFile.open(datafil, std::ios::out);
     if (! outFile.is_open()) {
@@ -131,7 +124,6 @@ int write_to_file(string datafil,mat f_tilde,int n,double h)
     outFile.close();
     return 0;
 }
-
 
 double func_f (double x_i)
 {
