@@ -16,7 +16,7 @@ int write_to_file(string datafil,mat f_tilde,int n,double h);
 
 int main (int argc, char *argv[])
 {
-    int n = 100; double x_start = 0.0; double x_slutt = 1.0;
+    int n = atoi(argv[1]); double x_start = 0.0; double x_slutt = 1.0;
     double h = (x_slutt-x_start)/(n+1); //x_i = i*h
 
     mat a = ones<vec>(n);a[0] = 0;
@@ -35,18 +35,19 @@ int main (int argc, char *argv[])
         if (i!=n-1) A(i,i+1) = c[i];
         if (i!=n-1) A(i+1,i) = a[i+1];
     }
-    //vec ar = solve(A,f_tilde);
+    vec ar = solve(A,f_tilde);
     //solving done
 
     boost::timer t_;
     mat specific_answer = specific_solver(b,f_tilde,n);
     cout << "Time usage: " << t_.elapsed() << endl;
-    write_to_file("specific.dat",specific_answer,n,h);
+    write_to_file("Specific.dat",specific_answer,n,h);
 
     boost::timer t;
     mat general_answer = general_solver(a,b,c,f_tilde,n);
     cout << "Time usage: " << t.elapsed() << endl;
-    write_to_file("general.dat",general_answer,n,h);
+    write_to_file("General.dat",general_answer,n,h);
+
 
     boost::timer t__;
     mat LU_answer = LU_solver(f_tilde,A);
@@ -116,11 +117,11 @@ int write_to_file(string datafil,mat f_tilde,int n,double h)
         cout << "Problem opening file." << endl;
         exit(1);
     }
-    outFile << 0 << " " << 0 << endl;
+    //outFile << 0 << " " << 0 << endl;
     for (int i = 0; i < n; i++) {
         outFile << (i+1)*h << " " <<  f_tilde[i] << endl;
     }
-    outFile << 1 << " " << 0 << endl;
+    //outFile << 1 << " " << 0 << endl;
     outFile.close();
     return 0;
 }
