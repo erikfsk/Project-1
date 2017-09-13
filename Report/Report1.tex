@@ -1,0 +1,280 @@
+\documentclass[12pt,norsk,a4paper]{article}
+\usepackage{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+%\usepackage{calc}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{color}
+\usepackage{physics}
+\usepackage{listings}
+\usepackage{siunitx}
+\usepackage{todonotes}
+\usepackage[version=4]{mhchem}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{tikz}
+\usepackage{mhchem}
+\usepackage{pdfpages}
+\usepackage[margin=1.3cm, includeheadfoot]{geometry}
+\newcommand{\RN}[1]{%
+	\textup{\uppercase\expandafter{\romannumeral#1}}%
+}
+\renewcommand{\exp}[1]{\mathrm{e}^{#1}}
+
+
+
+%reference
+%\usepackage{biblatex}
+%\addbibresource{sources.bib}
+%to here
+
+%for text boxes
+\usepackage{fancybox}
+\usepackage{framed}
+\usepackage{color}
+\definecolor{shadecolor}{rgb}{1,0.8,0.3}
+%to here
+
+
+
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstset{showstringspaces=false,
+	basicstyle=\ttfamily,
+	keywordstyle=\color{codegreen},
+	commentstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	breaklines=true,
+	literate={0}{{\textcolor{blue}{0}}}{1}%
+	{1}{{\textcolor{blue}{1}}}{1}%
+	{2}{{\textcolor{blue}{2}}}{1}%
+	{3}{{\textcolor{blue}{3}}}{1}%
+	{4}{{\textcolor{blue}{4}}}{1}%
+	{5}{{\textcolor{blue}{5}}}{1}%
+	{6}{{\textcolor{blue}{6}}}{1}%
+	{7}{{\textcolor{blue}{7}}}{1}%
+	{8}{{\textcolor{blue}{8}}}{1}%
+	{9}{{\textcolor{blue}{9}}}{1}%
+	{.0}{{\textcolor{blue}{.0}}}{2}% Following is to ensure that only periods
+	{.1}{{\textcolor{blue}{.1}}}{2}% followed by a digit are changed.
+	{.2}{{\textcolor{blue}{.2}}}{2}%
+	{.3}{{\textcolor{blue}{.3}}}{2}%
+	{.4}{{\textcolor{blue}{.4}}}{2}%
+	{.5}{{\textcolor{blue}{.5}}}{2}%
+	{.6}{{\textcolor{blue}{.6}}}{2}%
+	{.7}{{\textcolor{blue}{.7}}}{2}%
+	{.8}{{\textcolor{blue}{.8}}}{2}%
+	{.9}{{\textcolor{blue}{.9}}}{2}%
+}
+
+
+
+
+\begin{document}
+\author{Thomas Aarflot Storaas and Erik Fagerås Skaar\\
+	Department of Chemistry\\
+	University of Oslo\\	
+}
+
+\title{Project 1}
+\maketitle
+
+\textbf{Vi har desverre tullet det til med tiden. Vi har gjort ferdig koden og er på god vei, men rapporten er ikke helt der. For en oppdatert versjon av rapporten og koden gå til \href{https://github.com/erikfsk/Project-1}{githuben vår}(\href{https://github.com/erikfsk/Project-1}{https://github.com/erikfsk/Project-1}).}
+
+\section{Abstract}
+In this article the numerical approximation to a one dimensional Poisson equation is studied. Three approaches are taken. One with a straight forward Gaussian elimination in a general form. one in a spesified gaussian elimination form. The third approach are done with LU decomposition using the libarary "Armadillo". The numericaL accuracy is then analysed and the three methods are then compared with respect to FLOPS and time used. %\cite{Armadillo}
+
+
+\section{Underlying theory}
+
+The Poisson's equation is a classical equation from electromagnetism, which states that $\nabla^2\Phi=-4\pi\rho(\mathbf{(r)})$. The electrostatic potential $\Phi$ is a sentro- symmetrical potential, which makes it possible to rewrite the potential as a one dimentional equation with respect to the distance from origo, $\mathbf{r}$.
+\begin{align*}
+	\frac{1}{r^2}\pdv{r}\qty(r^2 \pdv{\Phi}{r})=-4\pi\rho(r)
+\end{align*}
+Introducing the substitutions $\Phi(r)=\phi(r)/r$ gives:
+\begin{align}
+	\pdv[2]{\phi}{r}=-4\pi r \rho(r)
+\end{align}
+
+Further manipulation of the expression with letting $x\to  u$ and $r\to x$ gives:
+\begin{align*}
+	-u''(x)=f(x)
+\end{align*}
+
+For this project the Poisson equation will be solved with Dirichlet boundary conditions and source function $f(x)=100\exp{-10x}$, in the interval $x\in[0,1]$, which gives.
+\begin{align}
+	u(0)=u(1)=0
+\end{align}\label{2}
+For this specific source function a numerical solution can be found by doing a double integration, and using the Dirichlet boundary conditions. 
+\begin{align*}
+	f(x)&=100\exp{-10x}\\
+	\int f(x)\dd[2]{x}&=c_1x+c_2 + e^{-10 x}\\
+	&=1-\qty(1-\exp{-10})x-\exp{-10x}
+\end{align*}
+
+The discretized approximation to $u$ is $v_i$, where the step size is defined as $h=1/(n+1)$ with grid points(sample step) $x_i=ih$. The discretized approximation from $\ref{2}$ gives $v_0=v_{n+1}=0$. The second derivative approximation of $u$ are
+\begin{align*}
+	&f_i=-\frac{v_{i+1}+2v_{i}-{v_{i-1}}}{h^2}&i=1,2...n
+\end{align*} 
+
+For each step $x_i$ a equation can be found:
+
+\begin{align*}
+	f_2=(-v_{1}+2v_{2}-v_{3})/h^2\\
+	f_3=(-v_{2}+2v_{3}-v_{4})/h^2\\
+	f_4=(-v_{3}+2v_{4}-v_{5})/h^2\\
+\end{align*}
+
+Note here that the end points are not included. This system of equations can be organized in a matrix, by defining $\tilde{b}_i=h^2f_i$.
+\begin{align*}
+	\begin{array}{cccc}
+	2 & -1 & 0 & 0 \\ 
+	-1 & 2 & -1 & 0 \\ 
+	0 & -1 & 2 & -1 \\ 
+	0 & 0 & -1 & 2
+	\end{array}
+\end{align*}
+ A row reduction of $A\mathbf{x}=f$ will give the solution to all the equations.
+
+
+\section{Method}
+
+\subsection*{General brute force Gaussian elimination}
+
+The matrix equations we need to solve is the following:
+
+\begin{align*}
+	\mathbf{A} = \begin{bmatrix}
+	b_1& c_1 & 0 &\dots   & \dots &\dots \\
+	a_1 & b_2 & c_2 &\dots &\dots &\dots \\
+	& a_2 & b_3 & c_3 & \dots & \dots \\
+	& \dots   & \dots &\dots   &\dots & \dots \\
+	&   &  &a_{n-2}  &b_{n-1}& c_{n-1} \\
+	&    &  &   &a_{n-1} & b_n \\
+	\end{bmatrix}\begin{bmatrix}
+	v_1\\
+	v_2\\
+	\dots \\
+	\dots  \\
+	\dots \\
+	v_n\\
+	\end{bmatrix}
+	=\begin{bmatrix}
+	\tilde{b}_1\\
+	\tilde{b}_2\\
+	\dots \\
+	\dots \\
+	\dots \\
+	\tilde{b}_n\\
+	\end{bmatrix}
+\end{align*}
+
+Applying a general approach to the gaussian elimination of a $4\cross4$ matrix gives an expression which can be generalized:
+
+\begin{align*}
+\begin{bmatrix}
+b_1 & c_1 & 0 & 0 \\ 
+a_1 & b_2 & c_2 & 0 \\ 
+0 & a_2 & b_3 & c_3 \\ 
+0 & 0 & a_3 & b_4
+\end{bmatrix}\begin{bmatrix}
+\tilde{b}_1 \\ 
+\tilde{b}_2 \\ 
+\tilde{b}_3 \\ 
+\tilde{b}_4
+\end{bmatrix}\to
+\begin{bmatrix}
+1 & c_1/b_1 & 0 & 0 \\ 
+0 & b_2-(c_1/b_1)a_2 & c_2 & 0 \\ 
+0 & a_2 & b_3 & c_3 \\ 
+0 & 0 & a_3 & b_4
+\end{bmatrix}\begin{bmatrix}
+\tilde{b}_1/b_1 \\ 
+\tilde{b}_2-(\tilde{b}_1/b_1)a_1 \\ 
+\tilde{b}_3 \\ 
+\tilde{b}_4
+\end{bmatrix}
+\end{align*}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Result}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Discussion}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Conclusion}
+The specific solution is the fastet, but if the matrix have a slight change it does not solve the problem we have. The general is almost as fast, but it can solve a wider range of tridiagonal matrices. The LU solution is the slowest. It is useful no matter what matrix you have, but it has a significant drawback in speed. By our calculations the error is the same for every method. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%\printbibliography
+
+\end{document}
