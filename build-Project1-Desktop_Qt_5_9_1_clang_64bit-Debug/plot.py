@@ -6,23 +6,23 @@ from subprocess import Popen, PIPE
 
 def les_og_plot_resultater():
 	max_error_list = []
-	x = range(3,13)
+	x = range(3,10)
 	for i in x:
 		os.system("./Project1 %.d" % 2**(i))
 		output = Popen(["ls"], stdout=PIPE).communicate()[0]
-		datfiler = re.findall(".*\.dat",output,re.IGNORECASE)
-		for filen in datfiler:
-			#numerical answer
-			x_numerical, y_numerical = read_file_and_put_in_arrays(filen)
-			#analytic answer
-			x_analytic = linspace(0,1,len(x_numerical)+2)[1:-1]
-			y_analytic = 1-(1 - exp(-10))*x_analytic - exp(-10*x_analytic);
-			#error
-			max_error_list.append(max(log2(abs((y_numerical-y_analytic)/y_analytic))))
-			break
+		#numerical answer
+		x_numerical, y_numerical = read_file_and_put_in_arrays("Specific.dat")
+		#analytic answer
+		x_analytic = linspace(0,1,len(x_numerical)+2)[1:-1]
+		y_analytic = 1-(1 - exp(-10))*x_analytic - exp(-10*x_analytic);
+		#error
+		max_error_list.append(max(log2(abs((y_numerical-y_analytic)/y_analytic))))
 
 	plot(x,max_error_list)
+	ylabel("$\mathrm{log_2}(max \quad error)$")
+	xlabel("$\mathrm{log_2}(n)$")
 	savefig("Error.pdf",bbox_inches="tight")
+	exit()
 
 	output = Popen(["ls"], stdout=PIPE).communicate()[0]
 	datfiler = re.findall(".*\.dat",output,re.IGNORECASE)
