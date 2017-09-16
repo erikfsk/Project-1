@@ -6,9 +6,9 @@ from subprocess import Popen, PIPE
 
 def les_og_plot_resultater():
 	max_error_list = []
-	x = range(3,10)
+	x = range(1,4)
 	for i in x:
-		os.system("./Project1 %.d" % 2**(i))
+		os.system("./Project1 %.d" % 10**(i))
 		output = Popen(["ls"], stdout=PIPE).communicate()[0]
 		#numerical answer
 		x_numerical, y_numerical = read_file_and_put_in_arrays("Specific.dat")

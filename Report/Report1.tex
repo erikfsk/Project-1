@@ -252,13 +252,20 @@ Let $d_i$ denote the previous lines result, and $v_i$ denote the previous $\tild
 
 When we have the general Gaussian elimination, we simple take out anything that is unnecessary to calculate. For example we don't need to the a-vector. Simply because it will become zero. And for the backward substitution we don't need to calculate the c-vektor. Same reason as for the a-vector.  
 
+
+
+
 \subsection{LU decomposition}
-Test
+If we assume that the matrix is invertible, we can do an LU decomposition. This means that instead of $A \textbf{v} = \tilde{b}$ we can write the equation as $L\textbf{y} = \tilde{b}$ and $U\textbf{v} = \textbf{y}$. Where L is a matrix where all the elements above the diagonal is zero and U is a matrix where all the elements below the diagonal is zero. We simply used the library armadillo and therefore did not use any special method for solving these equations. 
 
 
 \subsection{Error}
-Test
 
+The problem does have an analytic solution. We started with $f(x) = 100e^{-10x}$ and filled our vector with values between 0 and 1. And this gives the analytic solution $u(x) = 1-(1-e^{-10})x-e^{-10x}$. Because we have the analytic solution we can calculate the relative error. $u_i$ is the analytic solution and $v_i$ is the numerical answer. 
+\[
+   \epsilon_i=log_{2}\left(\left|\frac{v_i-u_i}
+                 {u_i}\right|\right),
+\]
 
 
 
@@ -404,7 +411,29 @@ The time estimate for the different implementation is shown in the table below. 
 
 \section{Discussion}
 
+From \ref{fig:error} we can see how the error behaves. The slope seem to be near 2. 
 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{bilder/n10}
+	\caption{The numerical solution against the analytic solution when n is equal to 10.}
+	\label{fig:n10}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{bilder/n100}
+	\caption{The numerical solution against the analytic solution when n is equal to 100.}
+	\label{fig:n100}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{bilder/n1000}
+	\caption{The numerical solution against the analytic solution when n is equal to 1000.}
+	\label{fig:n1000}
+\end{figure}
 
 
 
