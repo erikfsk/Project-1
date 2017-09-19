@@ -5,6 +5,7 @@
 \usepackage{amssymb}
 %\usepackage{calc}
 \usepackage{graphicx}
+\usepackage{subcaption}
 \usepackage{float}
 \usepackage{color}
 \usepackage{physics}
@@ -84,7 +85,7 @@
 
 
 \begin{document}
-\author{Thomas Aarflot Storaas and Erik Fagerås Skaar\\
+\author{Erik Fagerås Skaar and Thomas Aarflot Storaas\\
 	Department of Chemistry\\
 	University of Oslo\\	
 }
@@ -93,7 +94,7 @@
 \maketitle
 
 \section{Abstract}
-In this article the numerical approximation to a one dimensional Poisson equation is studied. Three approaches are taken. One with a straight forward Gaussian elimination in a general form. One in a specified gaussian elimination form. The third approach are done with LU decomposition using the libarary "Armadillo". The numerical accuracy is then analysed and the three methods are then compared with respect to FLOPS and time used. All the code can be found at \href{https://github.com/erikfsk/Project-1}{https://github.com/erikfsk/Project-1}. %\cite{Armadillo}
+In this article the numerical approximation to a one dimensional Poisson equation is studied. Three approaches are taken. One with a straight forward Gaussian elimination in a general form. One in a specified gaussian elimination form. The third approach are done with LU decomposition using the libarary "Armadillo". The numerical accuracy is then analysed and the three methods are then compared with respect to FLOPS and time used. All the code can be found at \href{https://github.com/erikfsk/Project-1}{\textcolor{blue}{github}}. %\cite{Armadillo}
 
 
 \section{Underlying theory}
@@ -369,7 +370,7 @@ Unfortunately it's quit hard to count the number of FLOPs in this code. From the
 
 \subsection{Time and Error}
 
-The time estimate for the different implementation is shown in the table below. \\
+The time estimate for the different implementation is shown in the table below. 
 
 	\begin{tabular}{|c|c|c|c|c|c|c|}
 		\hline 
@@ -388,8 +389,8 @@ The time estimate for the different implementation is shown in the table below. 
 
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.7\linewidth]{bilder/error}
-		\caption{The plot is produced by the python script on our \href{https://github.com/erikfsk/Project-1}{github}. It runs the main.cpp program and checks the max error for different n-values.}
+		\includegraphics[width=0.5\linewidth]{bilder/error}
+		\caption{The plot is produced by the python script on our \href{https://github.com/erikfsk/Project-1}{\textcolor{blue}{github}}. It runs the main.cpp program and checks the max error for different n-values.}
 		\label{fig:error}
 	\end{figure}
 
@@ -397,43 +398,41 @@ The time estimate for the different implementation is shown in the table below. 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+\begin{figure*}[t!]
+    \centering
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+		\includegraphics[width=\linewidth]{bilder/n10}
+		\label{fig:n1000}
+    \end{subfigure}%
+    ~ 
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+		\includegraphics[width=\linewidth]{bilder/n100}
+		\label{fig:n1000}
+    \end{subfigure}
+     ~ 
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+		\includegraphics[width=\linewidth]{bilder/n1000}
+		\label{fig:n1000}
+    \end{subfigure}
+    \label{fig:n}
+    \caption{The numerical answer against the analytic solution for n $n=10$,$n=100$ and $n=1000$ (starting from the left). }
+\end{figure*}
 
 \section{Discussion}
 
-From \ref{fig:error} we can see how the error behaves. The slope seem to be near 2. 
+From \ref{fig:error} we can see how the error behaves. The slope is near 2 for the first part of the graph. When we get to $2^{-10}$ the slope goes to near zero and then up. This is because of the way the computer works. When you represent an infinite set of numbers with a finite number of bit, then you can only represents number accurate to a certain point. This is what is happening here. We are simply working with so small numbers that we cant represent them accurately anymore. This is the reason that the error suddenly starts to get bigger. 
+\\
+\\
+The results of the three methods give the same result. The specific will use less time, then the other two. We can see this from the FLOP calculation in the method part.
+\\
+\\
+ When you use the specific method you only need to work with two arrays in the memory. This in turn mean that you can work with larger arrays before running out of memory. And if you count the arrays in LU method. You will se that this method uses much more memory to do the calculation. This means that even tho the LU is simpler to implement, it has it's weaknesses. 
 
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.7\linewidth]{bilder/n10}
-	\caption{The numerical solution against the analytic solution when n is equal to 10.}
-	\label{fig:n10}
-\end{figure}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.7\linewidth]{bilder/n100}
-	\caption{The numerical solution against the analytic solution when n is equal to 100.}
-	\label{fig:n100}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.7\linewidth]{bilder/n1000}
-	\caption{The numerical solution against the analytic solution when n is equal to 1000.}
-	\label{fig:n1000}
-\end{figure}
 
 
 
